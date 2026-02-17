@@ -14,7 +14,7 @@ final class NetworkReachability {
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitor")
     
-    private(set) var isConnected: Bool = false
+    private(set) var isConnected: Bool = true
     
     private init() {
         monitor.pathUpdateHandler = { [weak self] path in

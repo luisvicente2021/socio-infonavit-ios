@@ -9,12 +9,16 @@ import SwiftUI
 @main
 struct SocioInfonavitApp: App {
     
-
+    
     @State private var showSplash = true
     @State private var isAuthenticated = false
     
     @StateObject private var loginViewModel = LoginViewModel()
     @StateObject private var benevitsViewModel = BenevitsViewModel()
+    
+    init() {
+           _ = NetworkReachability.shared
+       }
     
     var body: some Scene {
         WindowGroup {
@@ -55,6 +59,7 @@ struct SocioInfonavitApp: App {
         withAnimation {
             isAuthenticated = false
             benevitsViewModel.clearData()
+            loginViewModel.clearCredentials()
         }
     }
 }

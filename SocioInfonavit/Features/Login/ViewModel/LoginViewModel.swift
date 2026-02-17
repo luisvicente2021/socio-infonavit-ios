@@ -129,6 +129,13 @@ final class LoginViewModel: ObservableObject {
             isAuthenticated = true
         }
     }
+    
+    func clearCredentials() {
+        username = ""
+        password = ""
+        errorMessage = nil
+        isLoading = false
+    }
 }
 
 

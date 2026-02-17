@@ -18,6 +18,9 @@ final class BenevitsViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var searchQuery: String = ""
+    
+    // MARK: - isSearching indica el debounce activo (delay visual mientras el usuario escribe)
+    // Cuando el endpoint esté disponible, también cubrirá la espera de la respuesta del API.
     @Published var isSearching: Bool = false
     
     private var searchTask: Task<Void, Never>?
@@ -26,14 +29,19 @@ final class BenevitsViewModel: ObservableObject {
         self.networkManager = networkManager
     }
     
+    // MARK: - Computed: filtra localmente sobre allBenevits
+    // Cuando el endpoint de búsqueda esté activo, este computed simplemente
+    // devolverá allBenevits sin filtrar (el servidor ya habrá devuelto los resultados correctos).
     var displayedBenevits: [Benevit] {
-        if searchQuery.isEmpty {
+        let trimmed = searchQuery.trimmingCharacters(in: .whitespaces)
+        
+        guard !trimmed.isEmpty else {
             return allBenevits
         }
         
         return allBenevits.filter { benevit in
-            benevit.name.localizedCaseInsensitiveContains(searchQuery) ||
-            (benevit.description?.localizedCaseInsensitiveContains(searchQuery) ?? false)
+            benevit.name.localizedCaseInsensitiveContains(trimmed) ||
+            (benevit.description?.localizedCaseInsensitiveContains(trimmed) ?? false)
         }
     }
     
@@ -44,16 +52,28 @@ final class BenevitsViewModel: ObservableObject {
     func searchBenevits(query: String) {
         searchTask?.cancel()
         
+        let trimmed = query.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else {
+            isSearching = false
+            return
+        }
+        
+        isSearching = true
+        
         searchTask = Task {
+            // Debounce: espera a que el usuario deje de escribir
             try? await Task.sleep(nanoseconds: 500_000_000)
             
-            if !Task.isCancelled {
-                if query.isEmpty {
-                    await performLoadBenevits()
-                } else {
-                    await performSearch(query: query)
-                }
-            }
+            guard !Task.isCancelled else { return }
+            
+            // TODO: Descomentar cuando el endpoint esté disponible.
+            // En ese caso también eliminar el filtro local en displayedBenevits
+            // y simplemente retornar allBenevits allí.
+            // await performSearch(query: trimmed)
+            
+            // Con mock, el filtro ya ocurre en displayedBenevits de forma reactiva.
+            // Solo apagamos el indicador de búsqueda tras el debounce.
+            isSearching = false
         }
     }
     
@@ -65,7 +85,6 @@ final class BenevitsViewModel: ObservableObject {
         loadBenevits()
     }
     
-    /// Limpia todos los datos al hacer logout
     func clearData() {
         allBenevits = []
         myBenevits = []
@@ -110,6 +129,8 @@ final class BenevitsViewModel: ObservableObject {
         isLoading = false
     }
     
+    // TODO: Activar cuando el endpoint de búsqueda esté disponible.
+    // Reemplaza el filtro local de displayedBenevits por resultados del servidor.
     private func performSearch(query: String) async {
         guard !query.isEmpty else { return }
         
@@ -123,6 +144,8 @@ final class BenevitsViewModel: ObservableObject {
                 responseType: SearchResponse.self
             )
             
+            // El servidor devuelve los resultados filtrados, allBenevits se reemplaza
+            // y displayedBenevits lo retornará sin filtrar (query ya no es vacía).
             allBenevits = response.benevits
             
         } catch let error as NetworkError {
