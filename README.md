@@ -1,2 +1,128 @@
-# socio-infonavit-ios
-  iOS app for Infonavit members - Built with SwiftUI, MVVM
+# Socio Infonavit iOS
+
+Aplicación iOS para los socios de Infonavit, desarrollada como prueba técnica.
+
+## 📱 Screenshots
+
+> _Agregar screenshots de la app aquí_
+
+## 🏗️ Arquitectura
+
+- **Patrón:** MVVM (Model - View - ViewModel)
+- **UI:** SwiftUI
+- **Concurrencia:** async/await 
+- **Inyección de dependencias** 
+
+
+## ✨ Funcionalidades
+
+- [x] Splash Screen con animación
+- [x] Login con validación de credenciales
+- [x] Encriptación RSA de credenciales
+- [x] Grid de Benevits (locked/unlocked)
+- [x] Búsqueda con debounce
+- [x] Menú lateral (Side Menu)
+- [x] Logout con confirmación
+- [x] Detección de internet real (NetworkReachability)
+- [x] Estados de carga (Skeleton View)
+- [x] Estados de error con retry
+- [x] Localización (Localizable.strings)
+- [x] Tests unitarios (ViewModels + Mock)
+
+## 🧪 Testing
+
+El proyecto incluye tests unitarios con un `MockNetworkService` dedicado:
+
+- **LoginViewModelTests** - Validaciones, login exitoso/fallido, estados
+- **BenevitsViewModelTests** - Carga, búsqueda, debounce, errores
+
+### Credenciales de Test (modo Mock)
+
+| Usuario | Contraseña | Resultado |
+|---------|------------|-----------|
+| 61917612998 | Contrasena01 | ✅ Login exitoso |
+| 61998018420 | Contrasena02 | ✅ Login exitoso |
+| 61900000000 | ServerError | 🔴 Error 500 |
+| 61911111111 | SlowNetwork | 🐌 Delay 3.5s |
+| 61922222222 | Timeout | ⏱️ Timeout |
+| Cualquier otro | Cualquier otra | ❌ Credenciales incorrectas |
+
+## 🛠️ Tecnologías
+
+| Tecnología | Uso |
+|------------|-----|
+| SwiftUI | UI declarativa |
+| async/await | Concurrencia |
+| XCTest | Tests unitarios |
+| Network.framework | Detección de internet |
+| Security.framework | Encriptación RSA |
+| NSLocalizedString | Localización |
+
+## 📋 Requisitos
+
+- iOS 16.0+
+- Xcode 15.0+
+- Swift 5.9+
+
+## 🚀 Instalación
+
+```bash
+# Clonar repositorio
+https://github.com/luisvicente2021/socio-infonavit-ios.git
+
+# Abrir en Xcode
+cd socio-infonavit-ios
+open SocioInfonavit.xcodeproj
+```
+
+## ⚙️ Configuración
+
+### Modo Mock (desarrollo)
+```swift
+// NetworkConfiguration.swift
+static let useMockData: Bool = true
+```
+
+### Modo Real (producción)
+```swift
+static let useMockData: Bool = false
+```
+
+## 👨‍💻 Autor
+
+**[Luis Angel Vicente]**
+- GitHub: [@tu_usuario](https://https://github.com/luisvicente2021)
+
+
+_Desarrollado como prueba técnica para vacante iOS Developer_
+
+## ⚙️ Configuración
+
+### Cambiar entre Mock y Producción
+
+En `NetworkConfiguration.swift`:
+
+```swift
+// Desarrollo (Mock)
+static let useMockData: Bool = true
+
+// Producción (API Real)
+static let useMockData: Bool = false
+```
+
+## 🔑 Credenciales de Testing
+
+> Solo aplican cuando `useMockData = true`
+
+| Escenario | Usuario | Contraseña | Resultado |
+|-----------|---------|------------|-----------|
+| ✅ Login exitoso | 61917612998 | Contrasena01 | Accede a Home |
+| ✅ Login exitoso | 61998018420 | Contrasena02 | Accede a Home |
+| ❌ Credenciales incorrectas | cualquiera | cualquiera | Error 401 |
+| 🔴 Error de servidor | 61900000000 | ServerError | Error 500 |
+| ⏱️ Timeout | 61922222222 | Timeout0000 | Error timeout |
+| 📡 Sin internet | — | — | Desactiva WiFi en el dispositivo |
+
+> **Nota:** La detección de internet es **REAL** usando `NWPathMonitor`, no simulada.
+
+
