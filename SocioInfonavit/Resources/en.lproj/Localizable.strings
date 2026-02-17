@@ -1,0 +1,136 @@
+/* 
+  Localizable.strings
+  SocioInfonavit
+
+  Created by luisr on 15/02/26.
+  
+*/
+
+// MARK: - Home / Navigation
+"home.title" = "Benevits";
+"home.request" = "Lo quiero";
+"home.welcome" = "Bienvenido";
+"home.userLabel" = "Usuario Infonavit";
+"home.search.placeholder" = "Buscar benevits...";
+
+// MARK: - Login
+"login.title" = "Bienvenido";
+"login.subtitle" = "Inicia sesión para acceder a tus beneficios";
+"login.username.placeholder" = "Usuario";
+"login.username.label" = "Número de usuario";
+"login.password.placeholder" = "Contraseña";
+"login.password.label" = "Contraseña";
+"login.button" = "Iniciar sesión";
+
+// MARK: - Login Errors
+"login.error.username" = "El usuario debe tener 11 dígitos";
+"login.error.password" = "La contraseña debe tener al menos 8 caracteres";
+"login.error.unauthorized" = "Usuario o contraseña incorrectos";
+"login.error.noInternet" = "No hay conexión a internet";
+"login.error.timeout" = "La solicitud tardó demasiado tiempo";
+"login.error.server" = "Error del servidor (código: %d)";
+"login.error.encryption" = "No se pudo encriptar las credenciales";
+"login.failed" = "Credenciales incorrectas";
+
+// MARK: - Benevits
+"benevits.locked.button" = "Lo quiero";
+"benevits.category" = "Categoría: %@";
+"benevits.expires" = "Vence: %@";
+"benevits.myBenevits.title" = "Mis Benevits";
+"benevits.myBenevits.count" = "%d beneficios disponibles";
+
+// MARK: - Search
+"search.placeholder" = "Buscar benevits...";
+"search.noResults.title" = "No se encontraron benevits";
+"search.noResults.subtitle" = "Intenta con otro término de búsqueda";
+"search.searching" = "Buscando...";
+
+// MARK: - Empty / Errors
+"empty.title" = "No se encontraron benevits";
+"empty.subtitle" = "Intenta con otro término de búsqueda";
+"empty.noBenevits.title" = "No hay beneficios disponibles";
+"empty.noBenevits.subtitle" = "Vuelve a intentar más tarde";
+
+"error.title" = "¡Ups! Algo salió mal";
+"error.subtitle" = "Ocurrió un error inesperado";
+"error.retry" = "Reintentar";
+"error.noInternet.title" = "Sin conexión a internet";
+"error.noInternet.subtitle" = "Verifica tu conexión a internet";
+"error.server.title" = "Error del servidor";
+"error.server.subtitle" = "Intenta de nuevo en unos momentos";
+"error.unauthorized.title" = "Sesión expirada";
+"error.unauthorized.subtitle" = "Por favor inicia sesión nuevamente";
+
+// MARK: - Alerts / Logout
+"alert.logout.title" = "Cerrar sesión";
+"alert.logout.confirm" = "Cerrar sesión";
+"alert.logout.cancel" = "Cancelar";
+"alert.logout.message" = "¿Estás seguro que deseas cerrar sesión?";
+"alert.logout.success" = "Sesión cerrada correctamente";
+"alert.logout.redirecting" = "Redirigiendo al inicio de sesión...";
+
+// MARK: - Loading
+"loading.title" = "Cargando...";
+"loading.benevits" = "Cargando beneficios...";
+"loading.searching" = "Buscando...";
+
+// MARK: - General
+"general.ok" = "OK";
+"general.cancel" = "Cancelar";
+"general.close" = "Cerrar";
+"general.retry" = "Reintentar";
+"general.continue" = "Continuar";
+"general.back" = "Atrás";
+
+// MARK: - Side Menu Sections
+"menu.section.principal" = "PRINCIPAL";
+"menu.section.cuenta" = "CUENTA";
+
+// MARK: - Side Menu Items
+"menu.item.inicio" = "Inicio";
+"menu.item.misBenevits" = "Mis Benevits";
+"menu.item.buscar" = "Buscar beneficios";
+"menu.item.perfil" = "Mi perfil";
+"menu.item.notificaciones" = "Notificaciones";
+"menu.item.configuracion" = "Configuración";
+"menu.item.cerrarSesion" = "Cerrar sesión";
+
+// MARK: - Side Menu Subtitles
+"menu.subtitle.misBenevits" = "Ver tus beneficios";
+"menu.subtitle.cerrarSesion" = "Salir de tu cuenta";
+
+// MARK: - Side Menu Footer
+"menu.footer.title" = "Socio Infonavit";
+"menu.footer.version" = "Versión 1.0.0";
+
+// MARK: - Accessibility
+"accessibility.menu.button" = "Abrir menú";
+"accessibility.close.button" = "Cerrar";
+"accessibility.search.clear" = "Limpiar búsqueda";
+"accessibility.benevit.locked" = "Benevit bloqueado";
+"accessibility.benevit.unlocked" = "Benevit disponible";
+
+// MARK: LauchScreenView
+
+"launch.title" = "Socio Infonavit";
+"launch.subtitle" = "Tu programa de beneficios";
+
+
+// MARK: - My Benevits View
+
+"myBenevits.navigation.title" = "Mis Benevits";
+"myBenevits.close" = "Cerrar";
+
+"myBenevits.empty.title" = "Aún no tienes benevits";
+"myBenevits.empty.subtitle" = "Explora los benevits disponibles y presiona \"Lo quiero\" para desbloquearlos";
+
+
+// MARK: - Benevits ViewModel Errors
+
+"benevits.error.sessionExpired" = "Sesión expirada. Por favor inicia sesión nuevamente";
+"benevits.error.unexpected" = "Error inesperado: %@";
+
+
+// MARK: - Benevits Debug
+
+"benevits.request.success" = "Has solicitado el benevit correctamente";
