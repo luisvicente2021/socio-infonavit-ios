@@ -11,12 +11,10 @@ import XCTest
 @MainActor
 final class LoginViewModelTests: XCTestCase {
     
-    // MARK: - SUT y Mocks
     var viewModel: LoginViewModel!
     var mockNetwork: MockNetworkService!
     var mockSession: MockSessionManager!
     
-    // MARK: - Setup
     override func setUp() {
         super.setUp()
         mockNetwork = MockNetworkService()
@@ -33,8 +31,6 @@ final class LoginViewModelTests: XCTestCase {
         mockSession = nil
         super.tearDown()
     }
-    
-    // MARK: - Computed Properties Tests
     
     func test_isLoginButtonEnabled_validInputs_returnsTrue() {
         viewModel.username = "12345678901"
@@ -72,20 +68,16 @@ final class LoginViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isPasswordValid)
     }
     
-    // MARK: - validateUsernameInput
     func test_validateUsernameInput_filtersNonNumbersAndLimitsTo11() {
         viewModel.validateUsernameInput("abc1234567890123xyz")
         XCTAssertEqual(viewModel.username, "12345678901")
     }
     
-    // MARK: - clearError
     func test_clearError_setsErrorMessageToNil() {
         viewModel.errorMessage = "Some error"
         viewModel.clearError()
         XCTAssertNil(viewModel.errorMessage)
     }
-    
-    // MARK: - login() Validation Errors
     
     func test_login_invalidUsername_setsErrorMessage() async {
         viewModel.username = "123"
@@ -103,8 +95,6 @@ final class LoginViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "La contraseña debe tener al menos 8 caracteres")
     }
     
-    // MARK: - login() Success
-    
     func test_login_success_setsAuthenticatedAndSavesToken() async {
         mockNetwork.shouldSucceed = true
         
@@ -118,8 +108,4 @@ final class LoginViewModelTests: XCTestCase {
         XCTAssertEqual(mockSession.savedToken, "test-token-12345")
         XCTAssertTrue(mockNetwork.requestCalled)
     }
-
-    // MARK: - login() Timeout Error
-    
-    
 }
