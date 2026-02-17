@@ -27,8 +27,6 @@ final class BenevitsViewModelTests: XCTestCase {
         super.tearDown()
     }
     
-    // MARK: - Load Benevits Tests
-    
     func test_loadBenevits_success() async {
         // Given
         let locked = [
@@ -42,9 +40,7 @@ final class BenevitsViewModelTests: XCTestCase {
         
         // When
         viewModel.loadBenevits()
-        
-        // Wait for async operation
-        try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 segundos
+        try? await Task.sleep(nanoseconds: 200_000_000)
         
         // Then
         XCTAssertFalse(viewModel.isLoading, "Loading debe ser false")
@@ -70,67 +66,92 @@ final class BenevitsViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "No hay conexión a internet")
     }
     
-    // MARK: - Search Tests
-    
-    func test_searchBenevits_withQuery_filtersResults() async {
+    func test_loadBenevits_setsLoadingState() async {
         // Given
-        let benevits = [
+        mockNetwork.mockDelay = 0.2
+        
+        // When
+        viewModel.loadBenevits()
+        
+        // Then
+        try? await Task.sleep(nanoseconds: 50_000_000) // 0.05s — en medio de la carga
+        XCTAssertTrue(viewModel.isLoading, "Debe estar loading mientras espera respuesta")
+        try? await Task.sleep(nanoseconds: 250_000_000) // 0.25s más — ya terminó
+        XCTAssertFalse(viewModel.isLoading, "No debe estar loading al terminar")
+    }
+    
+    func test_searchBenevits_withQuery_setsIsSearchingThenFalse() async {
+        // Given
+        viewModel.allBenevits = [
             Benevit(id: 1, name: "Cafe Starbucks", description: "Descuento", vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false),
             Benevit(id: 2, name: "Pizza Dominos", description: "2x1", vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false)
         ]
-        mockNetwork.mockSearchResponse = SearchResponse(benevits: benevits)
         
         // When
         viewModel.searchBenevits(query: "Cafe")
         
-        // CRÍTICO: Esperar el debounce (500ms) + tiempo de ejecución
-        try? await Task.sleep(nanoseconds: 700_000_000) // 0.7 segundos
-        
         // Then
-        XCTAssertTrue(mockNetwork.requestCalled, "Debe haber hecho el request")
-        XCTAssertEqual(viewModel.allBenevits.count, 2, "Debe tener 2 benevits del search")
-        XCTAssertFalse(viewModel.isSearching, "No debe estar buscando")
+        XCTAssertTrue(viewModel.isSearching, "Debe estar buscando durante el debounce")
+        try? await Task.sleep(nanoseconds: 700_000_000) // esperar debounce (500ms) + margen
+        XCTAssertFalse(viewModel.isSearching, "No debe estar buscando al terminar el debounce")
+        XCTAssertFalse(mockNetwork.requestCalled, "No debe llamar al API con el filtro local activo")
     }
     
-    func test_searchBenevits_withEmptyQuery_loadsAll() async {
+    func test_searchBenevits_withQuery_filtersResultsLocally() async {
         // Given
-        let locked = [
-            Benevit(id: 1, name: "Locked", description: nil, vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: true)
+        viewModel.allBenevits = [
+            Benevit(id: 1, name: "Cafe Starbucks", description: "Descuento", vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false),
+            Benevit(id: 2, name: "Pizza Dominos", description: "2x1", vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false)
         ]
-        let unlocked = [
+        
+        // When
+        viewModel.searchQuery = "Cafe"
+        
+        // Then
+        let displayed = viewModel.displayedBenevits
+        XCTAssertEqual(displayed.count, 1, "Debe mostrar solo el benevit que contiene 'Cafe'")
+        XCTAssertEqual(displayed.first?.name, "Cafe Starbucks")
+        XCTAssertEqual(viewModel.allBenevits.count, 2, "allBenevits no debe cambiar con el filtro local")
+    }
+    
+    func test_searchBenevits_withEmptyQuery_showsAllBenevits() async {
+        // Given
+        viewModel.allBenevits = [
+            Benevit(id: 1, name: "Locked", description: nil, vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: true),
             Benevit(id: 2, name: "Unlocked", description: nil, vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false)
         ]
-        mockNetwork.mockBenevitsResponse = BenevitsResponse(locked: locked, unlocked: unlocked)
+        viewModel.searchQuery = ""
         
         // When
         viewModel.searchBenevits(query: "")
         
-        // Wait for debounce + execution
-        try? await Task.sleep(nanoseconds: 700_000_000)
-        
         // Then
-        XCTAssertEqual(viewModel.allBenevits.count, 2, "Debe cargar todos los benevits")
+        XCTAssertFalse(viewModel.isSearching, "Query vacía no debe activar isSearching")
+        XCTAssertEqual(viewModel.displayedBenevits.count, 2, "Debe mostrar todos los benevits")
+        XCTAssertFalse(mockNetwork.requestCalled, "No debe llamar al API")
     }
     
     func test_searchBenevits_debounce_cancelsOldSearches() async {
         // Given
-        mockNetwork.mockSearchResponse = SearchResponse(benevits: [])
+        viewModel.allBenevits = [
+            Benevit(id: 1, name: "abc test", description: nil, vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false)
+        ]
         
-        // When - Llamar múltiples veces rápido
+        // When — simula escritura rápida
         viewModel.searchBenevits(query: "a")
         viewModel.searchBenevits(query: "ab")
         viewModel.searchBenevits(query: "abc")
         
-        // Wait for debounce
+        // Then
+        XCTAssertTrue(viewModel.isSearching, "Debe estar en debounce tras la última búsqueda")
         try? await Task.sleep(nanoseconds: 700_000_000)
-        
-        // Then - Solo debe haber hecho 1 request (el último)
-        XCTAssertEqual(mockNetwork.requestCallCount, 1, "Debe cancelar búsquedas anteriores")
+        XCTAssertFalse(viewModel.isSearching, "Debe haber terminado el debounce")
+        XCTAssertEqual(mockNetwork.requestCallCount, 0, "No debe haber llamado al API con filtro local activo")
+        viewModel.searchQuery = "abc"
+        XCTAssertEqual(viewModel.displayedBenevits.count, 1, "Debe filtrar con la query final")
     }
     
-    // MARK: - Display Tests
-    
-    func test_displayedBenevits_withEmptyQuery_showsAll() async {
+    func test_displayedBenevits_withEmptyQuery_showsAll() {
         // Given
         viewModel.allBenevits = [
             Benevit(id: 1, name: "Test 1", description: nil, vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false),
@@ -145,7 +166,7 @@ final class BenevitsViewModelTests: XCTestCase {
         XCTAssertEqual(displayed.count, 2, "Debe mostrar todos")
     }
     
-    func test_displayedBenevits_withQuery_filters() async {
+    func test_displayedBenevits_withQuery_filters() {
         // Given
         viewModel.allBenevits = [
             Benevit(id: 1, name: "Cafe Starbucks", description: nil, vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false),
@@ -162,25 +183,35 @@ final class BenevitsViewModelTests: XCTestCase {
         XCTAssertTrue(displayed.allSatisfy { $0.name.contains("Cafe") })
     }
     
-    // MARK: - Loading State Tests
-    
-    func test_loadBenevits_setsLoadingState() async {
+    func test_displayedBenevits_matchesByDescription() {
         // Given
-        mockNetwork.mockDelay = 0.2
+        viewModel.allBenevits = [
+            Benevit(id: 1, name: "Beneficio A", description: "Descuento en cine", vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false),
+            Benevit(id: 2, name: "Beneficio B", description: "2x1 en pizza", vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false)
+        ]
+        viewModel.searchQuery = "cine"
         
         // When
-        viewModel.loadBenevits()
+        let displayed = viewModel.displayedBenevits
         
-        // Then - Inmediatamente
-        try? await Task.sleep(nanoseconds: 50_000_000) // 0.05s
-        XCTAssertTrue(viewModel.isLoading, "Debe estar loading")
-        
-        // Wait for completion
-        try? await Task.sleep(nanoseconds: 250_000_000) // 0.25s más
-        XCTAssertFalse(viewModel.isLoading, "No debe estar loading")
+        // Then
+        XCTAssertEqual(displayed.count, 1, "Debe encontrar benevits que coincidan por descripción")
+        XCTAssertEqual(displayed.first?.id, 1)
     }
     
-    // MARK: - Error Handling Tests
+    func test_displayedBenevits_withWhitespaceOnlyQuery_showsAll() {
+        // Given
+        viewModel.allBenevits = [
+            Benevit(id: 1, name: "Test", description: nil, vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false)
+        ]
+        viewModel.searchQuery = "   "
+        
+        // When
+        let displayed = viewModel.displayedBenevits
+        
+        // Then
+        XCTAssertEqual(displayed.count, 1, "Espacios solos deben tratarse como query vacía")
+    }
     
     func test_clearError_removesErrorMessage() {
         // Given
@@ -234,8 +265,6 @@ final class BenevitsViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "La solicitud tardó demasiado tiempo")
     }
     
-    // MARK: - Request Benevit Test
-    
     func test_requestBenevit_doesNotCrash() {
         // Given
         let benevit = Benevit(id: 1, name: "Test", description: nil, vectorFullPath: nil, ally: nil, category: nil, expirationDate: nil, isLocked: false)
@@ -244,10 +273,7 @@ final class BenevitsViewModelTests: XCTestCase {
         XCTAssertNoThrow(viewModel.requestBenevit(benevit))
     }
     
-    // MARK: - Initial State Tests
-    
     func test_initialState_isCorrect() {
-        // Then
         XCTAssertTrue(viewModel.allBenevits.isEmpty)
         XCTAssertTrue(viewModel.myBenevits.isEmpty)
         XCTAssertFalse(viewModel.isLoading)
@@ -256,17 +282,3 @@ final class BenevitsViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.searchQuery.isEmpty)
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
