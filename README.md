@@ -4,7 +4,11 @@ Aplicación iOS para los socios de Infonavit, desarrollada como prueba técnica.
 
 ## 📱 Screenshots
 
-> _Agregar screenshots de la app aquí_
+<img width="200" height="500" alt="Simulator Screenshot - iPhone 16 Pro - 2026-02-16 at 23 40 09" src="https://github.com/user-attachments/assets/a413d1df-49f3-47d8-9796-1c28c24a46cd" />
+<img width="200" height="500" alt="Simulator Screenshot - iPhone 16 Pro - 2026-02-16 at 23 27 25" src="https://github.com/user-attachments/assets/ca7ca6b0-d831-4f76-920d-092442b07f53" />
+<img width="200" height="500" alt="Simulator Screenshot - iPhone 16 Pro - 2026-02-16 at 23 28 39" src="https://github.com/user-attachments/assets/a4fa3446-b372-47f5-828c-8ac38f84d59d" />
+<img width="200" height="500" alt="Simulator Screenshot - iPhone 16 Pro - 2026-02-17 at 00 07 21" src="https://github.com/user-attachments/assets/7869bd7b-2eb3-42a5-9b0a-f5624d635c13" />
+
 
 ## 🏗️ Arquitectura
 
@@ -91,8 +95,6 @@ static let useMockData: Bool = false
 ## 👨‍💻 Autor
 
 **[Luis Angel Vicente]**
-- GitHub: [@tu_usuario](https://https://github.com/luisvicente2021)
-
 
 _Desarrollado como prueba técnica para vacante iOS Developer_
 
