@@ -1,9 +1,3 @@
-//
-//  APIEndpoint.swift
-//  SocioInfonavit
-//
-//  Created by luisr on 11/02/26.
-//
 import Foundation
 
 protocol APIEndpoint {
@@ -23,9 +17,9 @@ enum HTTPMethod: String {
     case delete = "DELETE"
 }
 
-
 enum SocioInfonavitEndpoint: APIEndpoint {
-    case login(credentials: String)
+    
+    case login(credentials: String, username: String, password: String)
     case landingBenevits
     case searchBenevits(query: String)
     
@@ -59,7 +53,6 @@ enum SocioInfonavitEndpoint: APIEndpoint {
             "Accept": "application/json"
         ]
         
-        
         if case .login = self {
             return headers
         }
@@ -73,16 +66,18 @@ enum SocioInfonavitEndpoint: APIEndpoint {
     
     var body: [String: Any]? {
         switch self {
-        case .login(let credentials):
-            return ["credentials": credentials]
+        case .login(let credentials, let username, let password):
+            return [
+                "credentials": credentials,      // ← Para API real
+                "_mockUsername": username,        // ← Solo para Mock
+                "_mockPassword": password         // ← Solo para Mock
+            ]
         case .searchBenevits(let query):
             return ["query": query]
         case .landingBenevits:
             return nil
         }
     }
-    
-    // MARK: - URL Request Builder
     
     func asURLRequest() throws -> URLRequest {
         guard let url = URL(string: baseURL + path) else {
@@ -93,14 +88,13 @@ enum SocioInfonavitEndpoint: APIEndpoint {
         request.httpMethod = method.rawValue
         request.timeoutInterval = 30
         
-        // Agregar headers
         headers?.forEach { key, value in
             request.setValue(value, forHTTPHeaderField: key)
         }
         
-        // Agregar body si existe
         if let body = body {
-            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+            let apiBody = body.filter { !$0.key.hasPrefix("_mock") }
+            request.httpBody = try JSONSerialization.data(withJSONObject: apiBody)
         }
         
         return request

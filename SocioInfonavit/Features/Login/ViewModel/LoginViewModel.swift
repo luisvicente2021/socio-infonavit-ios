@@ -68,7 +68,11 @@ final class LoginViewModel: ObservableObject {
                 encryptedCredentials = RSAEncryption.mockEncryptCredentials(username: username, password: password)
             }
             
-            let endpoint = SocioInfonavitEndpoint.login(credentials: encryptedCredentials)
+            let endpoint = SocioInfonavitEndpoint.login(
+                credentials: encryptedCredentials,
+                username: username,
+                password: password
+            )
             let response = try await networkManager.requestWithHeaders(
                 endpoint: endpoint,
                 responseType: EmptyResponse.self

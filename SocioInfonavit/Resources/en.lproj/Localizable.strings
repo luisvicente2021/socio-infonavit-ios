@@ -30,6 +30,7 @@
 "login.error.timeout" = "La solicitud tardó demasiado tiempo";
 "login.error.server" = "Error del servidor (código: %d)";
 "login.error.encryption" = "No se pudo encriptar las credenciales";
+"login.failed" = "Credenciales incorrectas";
 
 // MARK: - Benevits
 "benevits.locked.button" = "Lo quiero";

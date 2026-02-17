@@ -7,13 +7,45 @@
 
 import Foundation
 
+/*
+ CONFIGURACIÓN DE ENTORNO
+ 
+ 
+ PARA CAMBIAR ENTRE MOCK Y PRODUCCIÓN:
+ Cambia el valor de `useMockData` abajo.
+ 
+ 1. DESARROLLO (Mock):
+ static let useMockData: Bool = true
+ 
+ 2. PRODUCCIÓN (API Real):
+ static let useMockData: Bool = false
+ (Requiere llave RSA configurada en RSAEncryption.swift)
+ 
+ LAS CREDENCIALES PARA TESTING :
+ (Solo cuando useMockData = true)
+ 
+ 
+ ✅ LOGIN EXITOSO:
+ 61917612998 / Contrasena01
+ 61998018420 / Contrasena02
+ 
+ ❌ CREDENCIALES INCORRECTAS:
+ Cualquier combinación no registrada arriba
+ 
+ 🔴 ERROR DE SERVIDOR (500):
+ 61900000000 / ServerError
+ 
+ ⏱️ TIMEOUT:
+ 61922222222 / Timeout0000
+ 
+ 📡 SIN INTERNET:
+ Desactiva WiFi/datos en el dispositivo
+ (La detección es REAL usando NWPathMonitor)
+ */
+
 /// Configuración global de red
 struct NetworkConfiguration {
     
-    /// CAMBIAR AQUÍ para usar Mock o Real
-    ///
-    /// true  = Usa datos MOCK (para desarrollo/testing)
-    /// false = Usa API REAL (requiere llave RSA)
     static let useMockData: Bool = true
     
     /// Delay simulado para mock (en segundos)

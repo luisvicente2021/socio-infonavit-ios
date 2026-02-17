@@ -1,8 +1,6 @@
 
 import Foundation
 
-// MARK: - Network Service Protocol
-
 protocol NetworkServiceProtocol {
     func request<T: Decodable>(
         endpoint: APIEndpoint,
@@ -142,35 +140,15 @@ final class NetworkService: NetworkServiceProtocol, ObservableObject {
     ) async throws -> (data: T, headers: [AnyHashable: Any]) {
         
         guard let body = endpoint.body,
-              let credentials = body["credentials"] as? String else {
+              let username = body["_mockUsername"] as? String,
+              let password = body["_mockPassword"] as? String else {
             print("❌ Mock: No se pudieron extraer credenciales")
             throw NetworkError.invalidResponse
         }
         
-        print("🔐 Mock: Recibidas credenciales encriptadas (longitud: \(credentials.count))")
+        print("🔍 Mock: Validando usuario: \(username)")
         
-        // Decodificar credenciales
-        var username: String?
-        var password: String?
-        
-        if let decoded = RSAEncryption.mockDecrypt(encryptedCredentials: credentials) {
-            print("🔓 Mock: Credenciales desencriptadas")
-            let parts = decoded.components(separatedBy: ":")
-            if parts.count == 2 {
-                username = parts[0]
-                password = parts[1]
-            }
-        }
-        
-        guard let user = username, let pass = password else {
-            print("❌ Mock: No se pudieron extraer usuario y password")
-            throw NetworkError.invalidResponse
-        }
-        
-        print("🔍 Mock: Validando credenciales para usuario: \(user)")
-        
-        // Validar credenciales
-        if let scenario = MockData.validateCredentials(username: user, password: pass) {
+        if let scenario = MockData.validateCredentials(username: username, password: password) {
             return try await handleMockCredentialScenario(scenario: scenario, responseType: T.self)
         } else {
             print("❌ Mock: Credenciales incorrectas")
